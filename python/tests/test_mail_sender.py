@@ -42,7 +42,7 @@ def test_send_v1():
     assert http_client.post_called
     assert http_client.post_args == (
         MailSender.base_url,
-        Request(user.name, user.email, "New notification", "Test message")
+        Request(user.email, user.name, "New notification", "Test message")
     )
 
 def test_send_v2():

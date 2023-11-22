@@ -100,3 +100,44 @@ def test_send_v2():
         MailSender.base_url,
         Request(user.name, user.email, "New notification", "Test message")
     )
+
+def test_send_v1_with_mock():
+    # Créer une instance de Mock pour HttpClient
+    http_client = Mock()
+
+    # Créer une instance de Mock pour User
+    user = Mock()
+    user.name = "Test User"
+    user.email = "test@example.com"
+
+    # Créer une instance de MailSender avec le Mock HttpClient
+    mail_sender = MailSender(http_client)
+
+    # Appeler la méthode send_v1
+    mail_sender.send_v2(user, "Test message")
+
+    # Vérifier que la méthode post du Mock HttpClient a été appelée avec les bons arguments
+    http_client.post.assert_called_once_with(
+        MailSender.base_url,
+        Request(user.email, user.name, "New notification", "Test message")
+    )
+
+def test_send_v2_with_mock():
+    # Créer une instance de Mock pour HttpClient
+    http_client = Mock()
+
+    # Créer une instance de Mock pour User
+    user = Mock()
+    user.name = "Test User"
+    user.email = "test@example.com"
+
+    # Créer une instance de MailSender avec le Mock HttpClient
+    mail_sender = MailSender(http_client)
+
+    # Appeler la méthode send_v1
+    mail_sender.send_v2(user, "Test message")
+
+    http_client.post.assert_called_with(
+        MailSender.base_url,
+        Request(user.email, user.name, "New notification", "Test message")
+    )

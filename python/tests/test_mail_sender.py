@@ -26,6 +26,20 @@ class MockHttpClient:
         self.post_called = True
         self.post_args = (url, request)
 
+class MockResponse:
+    def __init__(self, code):
+        self.code = code
+
+class MockHttpClient_v2:
+    def __init__(self):
+        self.post_called = False
+        self.post_args = None
+
+    def post(self, url, request):
+        self.post_called = True
+        self.post_args = (url, request)
+        return MockResponse(503)
+
 def test_send_v1_without_mock():
     # Créer une instance de MockHttpClient
     http_client = MockHttpClient()
@@ -68,5 +82,21 @@ def test_send_v1_with_mock():
     )
 
 def test_send_v2():
-    # TODO: write a test that fails due to the bug in MailSender.send_v2
-    pass
+    # Créer une instance de MockHttpClient
+    http_client = MockHttpClient_v2()
+
+    # Créer une instance de MockUser
+    user = MockUser("Test User", "test@example.com")
+
+    # Créer une instance de MailSender avec MockHttpClient
+    mail_sender = MailSender(http_client)
+
+    # Appeler la méthode send_v1
+    mail_sender.send_v2(user, "Test message")
+
+    # Vérifier que la méthode post de MockHttpClient a été appelée avec les bons arguments
+    assert http_client.post_called
+    assert http_client.post_args == (
+        MailSender.base_url,
+        Request(user.name, user.email, "New notification", "Test message")
+    )

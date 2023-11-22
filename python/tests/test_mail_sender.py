@@ -1,4 +1,5 @@
 from mail_sender import MailSender, Request
+from unittest.mock import Mock
 class MailSender:
     base_url = "https://api.mailsender.com"
 
@@ -25,7 +26,7 @@ class MockHttpClient:
         self.post_called = True
         self.post_args = (url, request)
 
-def test_send_v1():
+def test_send_v1_without_mock():
     # Créer une instance de MockHttpClient
     http_client = MockHttpClient()
 
@@ -41,6 +42,27 @@ def test_send_v1():
     # Vérifier que la méthode post de MockHttpClient a été appelée avec les bons arguments
     assert http_client.post_called
     assert http_client.post_args == (
+        MailSender.base_url,
+        Request(user.email, user.name, "New notification", "Test message")
+    )
+
+def test_send_v1_with_mock():
+    # Créer une instance de Mock pour HttpClient
+    http_client = Mock()
+
+    # Créer une instance de Mock pour User
+    user = Mock()
+    user.name = "Test User"
+    user.email = "test@example.com"
+
+    # Créer une instance de MailSender avec le Mock HttpClient
+    mail_sender = MailSender(http_client)
+
+    # Appeler la méthode send_v1
+    mail_sender.send_v1(user, "Test message")
+
+    # Vérifier que la méthode post du Mock HttpClient a été appelée avec les bons arguments
+    http_client.post.assert_called_once_with(
         MailSender.base_url,
         Request(user.email, user.name, "New notification", "Test message")
     )
